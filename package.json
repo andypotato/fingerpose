@@ -1,0 +1,35 @@
+{
+  "name": "fingerpose",
+  "version": "0.0.1",
+  "description": "Finger pose classifier for hand landmarks detected by TensorFlow.js handpose model",
+  "main": "dist/fingerpose.js",
+  "scripts": {
+    "dev": "webpack --mode development --progress --colors --watch",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andypotato/fingerpose.git"
+  },
+  "keywords": [
+    "TensorFlow",
+    "HandPose",
+    "Hand gesture",
+    "Finger pose estimation",
+    "Gesture estimation"
+  ],
+  "author": "Andreas Schallwig",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/andypotato/fingerpose/issues"
+  },
+  "homepage": "https://github.com/andypotato/fingerpose#readme",
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  }
+}
