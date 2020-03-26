@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Finger pose classifier for hand landmarks detected by TensorFlow.js handpose model",
   "main": "dist/fingerpose.js",
+  "source": "src/index.js",
   "scripts": {
     "dev": "webpack --mode development --progress --colors --watch",
     "build": "webpack --mode production"
