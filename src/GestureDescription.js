@@ -1,3 +1,5 @@
+import { Finger } from './FingerDescription';
+
 export default class GestureDescription {
   constructor(name) {
 
@@ -6,6 +8,9 @@ export default class GestureDescription {
 
     this.curls = {};
     this.directions = {};
+
+    this.weights = [1.0, 1.0, 1.0, 1.0, 1.0];
+    this.weightsRelative = [1.0, 1.0, 1.0, 1.0, 1.0];
   }
 
   addCurl(finger, curl, confidence) {
@@ -22,6 +27,15 @@ export default class GestureDescription {
     this.directions[finger].push([position, confidence]);
   }
 
+  setWeight(finger, weight) {
+
+    this.weights[finger] = weight;
+
+    // recalculate relative weights
+    let total = this.weights.reduce((a, b) => a + b, 0);
+    this.weightsRelative = this.weights.map(el => el * 5 / total );
+  }
+
   matchAgainst(detectedCurls, detectedDirections) {
 
     let confidence = 0.0;
@@ -36,14 +50,14 @@ export default class GestureDescription {
       if(typeof expectedCurls === 'undefined') {
         // no curl description available for this finger
         // add default confidence of "1"
-        confidence += 1;
+        confidence += this.weightsRelative[fingerIdx];
         continue;
       }
 
       // compare to each possible curl of this specific finger
       for(const [expectedCurl, score] of expectedCurls) {
         if(detectedCurl == expectedCurl) {
-          confidence += score;
+          confidence += score * this.weightsRelative[fingerIdx];
           break;
         }
       }
@@ -58,14 +72,14 @@ export default class GestureDescription {
       if(typeof expectedDirections === 'undefined') {
         // no direction description available for this finger
         // add default confidence of "1"
-        confidence += 1;
+        confidence += this.weightsRelative[fingerIdx];
         continue;
       }
 
       // compare to each possible direction of this specific finger
       for(const [expectedDirection, score] of expectedDirections) {
         if(detectedDirection == expectedDirection) {
-          confidence += score;
+          confidence += score * this.weightsRelative[fingerIdx];
           break;
         }
       }
