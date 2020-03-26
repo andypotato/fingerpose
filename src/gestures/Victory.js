@@ -37,5 +37,5 @@ victoryDescription.addDirection(Finger.Pinky, FingerDirection.HorizontalLeft, 0.
 // give additional weight to index and ring fingers
 victoryDescription.setWeight(Finger.Index, 2);
 victoryDescription.setWeight(Finger.Middle, 2);
-console.log(victoryDescription);
+
 export default victoryDescription;
