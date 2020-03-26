@@ -18,8 +18,8 @@ thumbsUpDescription.addDirection(Finger.Thumb, FingerDirection.DiagonalUpRight, 
 // - horizontal left or right
 for(let finger of [Finger.Index, Finger.Middle, Finger.Ring, Finger.Pinky]) {
   thumbsUpDescription.addCurl(finger, FingerCurl.FullCurl, 1.0);
-  thumbsUpDescription.addDirection(finger, FingerDirection.HorizontalLeft, 1);
-  thumbsUpDescription.addDirection(finger, FingerDirection.HorizontalRight, 1);
+  thumbsUpDescription.addDirection(finger, FingerDirection.HorizontalLeft, 1.0);
+  thumbsUpDescription.addDirection(finger, FingerDirection.HorizontalRight, 1.0);
 }
 
 export default thumbsUpDescription;
