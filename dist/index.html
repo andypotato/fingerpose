@@ -34,7 +34,7 @@
       position: relative;
     }
 
-    #video-container .layer {
+    .layer {
       position: absolute;
       top: 0;
       left: 0;
@@ -45,13 +45,20 @@
     #pose-video {
       transform: scaleX(-1);
     }
+
+    #pose-result {
+      font-size: 100px;
+      text-align: right;
+      padding: 20px 30px 0 0;
+    }
   </style>
 </head>
 <body>
 
   <div id="video-container">
-    <video ref="video" id="pose-video" class="layer" playsinline></video>
-    <canvas ref="canvas" id="pose-canvas" class="layer"></canvas>
+    <video id="pose-video" class="layer" playsinline></video>
+    <canvas id="pose-canvas" class="layer"></canvas>
+    <div id="pose-result" class="layer"></div>
   </div>
 
   <script>
@@ -69,11 +76,18 @@
       palmBase: 'white'
     };
 
+    const gestureStrings = {
+      'thumbs_up': '👍',
+      'victory': '✌🏻'
+    };
+
     async function main() {
 
       const video = document.querySelector("#pose-video");
       const canvas = document.querySelector("#pose-canvas");
       const ctx = canvas.getContext("2d");
+
+      const resultLayer = document.querySelector("#pose-result");
 
       // configure gesture estimator
       // add "✌🏻" and "👍" as sample gestures
@@ -92,6 +106,7 @@
 
         // clear canvas overlay
         ctx.clearRect(0, 0, config.video.width, config.video.height);
+        resultLayer.innerText = '';
 
         // get hand landmarks from video
         // Note: Handpose currently only detects one hand at a time
@@ -109,10 +124,17 @@
 
           // now estimate gestures based on landmarks
           // using a minimum confidence of 7.5 (out of 10)
-          const result = GE.estimate(predictions[i].landmarks, 7.5);
+          const estimatedGestures = GE.estimate(predictions[i].landmarks, 7.5);
 
-          console.log(result);
+          if(estimatedGestures.length > 0) {
 
+            // find gesture with highest confidence
+            let result = estimatedGestures.reduce((p, c) => { 
+              return (p.confidence > c.confidence) ? p : c;
+            });
+
+            resultLayer.innerText = gestureStrings[result.name];
+          }
         }
 
         // ...and so on
