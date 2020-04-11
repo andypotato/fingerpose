@@ -107,18 +107,20 @@ const thumbsDownGesture = new fp.GestureDescription('thumbs_down');
 Expect the thumb to be stretched out and pointing down:
 ```
 thumbsDownGesture.addCurl(fp.Finger.Thumb, fp.FingerCurl.NoCurl, 1.0);
-thumbsUpDescription.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownLeft, 0.25);
-thumbsUpDescription.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownRight, 0.25);
+thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.VerticalDown, 1.0);
+thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownLeft, 0.5);
+thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownRight, 0.5);
 ```
-This will define that a thumb pointing downwards will result in the highest confidence (1.0) for this gesture. If the thumb is angled to diagonal down left / right we can somehow still accept it, but with a lower confidence (0.25).
+This will define that a thumb pointing downwards will result in the highest confidence (1.0) for this gesture. If the thumb is angled to diagonal down left / right we can somehow still accept it, but with a lower confidence (0.5).
 
-All other fingers are expected to be fully curled and held to the left or right:
+All other fingers are expected to be fully curled. For this gesture it doesn't really matter which direction the curled fingers are pointing at therefore only the curl description is added.
 ```
 // do this for all other fingers
-thumbsUpDescription.addCurl(fp.Finger.Index, fp.FingerCurl.FullCurl, 1.0);
-thumbsUpDescription.addDirection(fp.Finger.Index, fp.FingerDirection.HorizontalLeft, 1.0);
-thumbsUpDescription.addDirection(fp.Finger.Index, fp.FingerDirection.HorizontalRight, 1.0);
-[...]
+thumbsDownGesture.addCurl(fp.Finger.Index, fp.FingerCurl.FullCurl, 1.0);
+thumbsDownGesture.addCurl(fp.Finger.Middle, fp.FingerCurl.FullCurl, 1.0);
+thumbsDownGesture.addCurl(fp.Finger.Ring, fp.FingerCurl.FullCurl, 1.0);
+thumbsDownGesture.addCurl(fp.Finger.Pinky, fp.FingerCurl.FullCurl, 1.0);
+
 ```
 
 #### The meaning of confidence
