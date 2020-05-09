@@ -1,4 +1,5 @@
 
+
 # fingerpose
 
 Finger pose classifier for hand landmarks detected by TensorFlow.js' [handpose](https://github.com/tensorflow/tfjs-models/tree/master/handpose) model. It can detect hand gestures like "Victory" ✌️or "Thumbs Up" 👍inside a webcam source picture. You can define additional hand gestures using [gesture descriptions](https://github.com/andypotato/fingerpose/tree/master/src/gestures). 
@@ -42,22 +43,37 @@ const GE = new fp.GestureEstimator([
 
 #### Use "handpose" to estimate the landmarks
 ```
-const  model  =  await  handpose.load();
-const  predictions  =  await  model.estimateHands(video,  true);
+const model = await handpose.load();
+const predictions = await model.estimateHands(video, true);
 ```
 
 #### Estimate the gestures
 ```
 // using a minimum confidence of 7.5 (out of 10)
-const  estimatedGestures  =  GE.estimate(predictions.landmarks,  7.5);
+const estimatedGestures = GE.estimate(predictions.landmarks, 7.5);
 ```
-The result is an array of possible gestures and their confidence, for example:
+The result is an object containing possible gestures and their confidence, for example:
 ```
-[
-    { name: 'thumbs_up', confidence: 9.25 },
+{
+    poseData: [ ... ],
+    gestures: [
+        { name: 'thumbs_up', confidence: 9.25 },
+        { ... }
+    ]
+}
+```
+
+In addition you receive the `poseData` array including the raw pose and direction information for each finger. This is useful for debugging purposes as it can help you understand how an individual finger curl / direction is estimated by the library.
+
+```
+// example for raw pose data
+poseData: [
+    ['Thumb', 'No Curl', 'Vertical Up],
+    ['Index', 'Half Curl', 'Diagonal Up Right'],
     ...
 ]
 ```
+
 ## Define your own gestures
 You can create any number of hand gestures for this library to recognize. To see how a gesture is described, have a look at the included sample gestures [Victory](https://github.com/andypotato/fingerpose/blob/master/src/gestures/Victory.js) and [Thumbs Up](https://github.com/andypotato/fingerpose/blob/master/src/gestures/ThumbsUp.js).
 
@@ -126,13 +142,19 @@ thumbsDownGesture.addCurl(fp.Finger.Pinky, fp.FingerCurl.FullCurl, 1.0);
 #### The meaning of confidence
 "Confidence" is a number between 0 and 10 which describes how accurate a given combination of finger curl / positions matches a predefined gesture. You should design your gestures so a perfect match will result in a confidence of "10".
 
-**Pro tip:** You can also have individual fingers reduce confidence which means "This finger should absolutely not appear in this way".
+## Tips to improve detection
 
-#### Debugging your gestures
+* The most stable detection is achieved when you can require confidences of 8 or higher.
+* Many poses do not require fingers pointing in a specific direction but are defined by curls only. In these cases just do not add direction constraints to your pose.
+* You can also have individual fingers reduce confidence which means "This finger should absolutely not appear in this way".
 
- - You can use the `printDebugInfo` parameter of `GestureEstimator::estimate()` to print out the detected curls / directions for each finger to the console. This way you can verify if your assumed curls / directions match with what the estimator actually sees.
- - To improve confidence you can adjust the "weight" of individual fingers using `GestureDescription::setWeight()`. A victory gesture for example is mostly defined by the stretched out index and middle fingers so you could add some weight to them.
- - The detection of landmarks depends on the TensorFlow.js handpose model. You can check their documentation how to improve detection and adjust parameters like confidence and detection threshold.
+## Debugging your gestures
+
+ Look at the raw pose data result in `GestureEstimator::estimate()` to understand the detected curls / directions for each finger to the console. This way you can verify if your assumed curls / directions match with what the estimator actually sees.
+
+## Known issues / limitations
+ - Currently only one hand is supported at the same time. This is a limitation of the underlying `handpose` model and may or may not change in the future.
+ - The `handpose` model has issues detecting a single stretched out finger (for example index finger). It will occasionally not detect a finger going from "curled" to "not curled" or vice-versa.
 
 
 ## Credits

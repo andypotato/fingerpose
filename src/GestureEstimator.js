@@ -11,21 +11,20 @@ export default class GestureEstimator {
     this.gestures = knownGestures;
   }
 
-  estimate(landmarks, minConfidence, printDebugInfo=false) {
+  estimate(landmarks, minConfidence) {
 
     let gesturesFound = [];
 
     // step 1: get estimations of curl / direction for each finger
     const est = this.estimator.estimate(landmarks);
 
-    if(printDebugInfo) {
-      for(let fingerIdx of Finger.all) {
-        console.log(
-          Finger.getName(fingerIdx),
-          FingerCurl.getName(est.curls[fingerIdx]),
-          FingerDirection.getName(est.directions[fingerIdx])
-        );
-      }
+    let debugInfo = [];
+    for(let fingerIdx of Finger.all) {
+      debugInfo.push([
+        Finger.getName(fingerIdx),
+        FingerCurl.getName(est.curls[fingerIdx]),
+        FingerDirection.getName(est.directions[fingerIdx])
+      ]);
     }
 
     // step 2: compare gesture description to each known gesture
@@ -39,6 +38,9 @@ export default class GestureEstimator {
       }
     }
 
-    return gesturesFound;
+    return {
+      poseData: debugInfo,
+      gestures: gesturesFound
+    };
   }
 }
