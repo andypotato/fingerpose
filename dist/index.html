@@ -124,12 +124,12 @@
 
           // now estimate gestures based on landmarks
           // using a minimum confidence of 7.5 (out of 10)
-          const estimatedGestures = GE.estimate(predictions[i].landmarks, 7.5);
+          const est = GE.estimate(predictions[i].landmarks, 7.5);
 
-          if(estimatedGestures.length > 0) {
+          if(est.gestures.length > 0) {
 
             // find gesture with highest confidence
-            let result = estimatedGestures.reduce((p, c) => { 
+            let result = est.gestures.reduce((p, c) => { 
               return (p.confidence > c.confidence) ? p : c;
             });
 
