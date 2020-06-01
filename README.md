@@ -27,8 +27,7 @@ A [fully working example](https://github.com/andypotato/fingerpose/blob/master/d
 
 #### Include "handpose" and this library
 ```
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
 <script src="fingerpose.js" type="text/javascript"></script>
 ```
