@@ -1,8 +1,18 @@
-# fingerpose
+# Fingerpose
 
-Finger pose classifier for hand landmarks detected by TensorFlow.js' [handpose](https://github.com/tensorflow/tfjs-models/tree/master/handpose) model. It can detect hand gestures like "Victory" ✌️or "Thumbs Up" 👍inside a webcam source picture. You can define additional hand gestures using [gesture descriptions](https://github.com/andypotato/fingerpose/tree/master/src/gestures). 
+Finger gesture classifier for hand landmarks detected by [MediaPipe Handpose](https://github.com/tensorflow/tfjs-models/tree/master/handpose). It detects gestures like "Victory" ✌️or "Thumbs Up" 👍inside a source image or video stream. You can define additional hand gestures using simple [gesture descriptions](https://github.com/andypotato/fingerpose/tree/master/src/gestures). 
 
 !["Thumbs up" and "Victory" gestures detected](https://raw.githubusercontent.com/andypotato/fingerpose/master/assets/fingers-lq.gif)
+
+# Usage
+
+- [How it works](#how-it-works)
+- [Installation](#installation)
+- [Demo](#demo)
+- [Define your own gestures](#define-your-own-gestures)
+- [Tips to improve detection](#tips-to-improve-detection)
+- [Known issues and limitations](#known-issues-and-limitations)
+- [Credits](#credits)
 
 ## How it works
 
@@ -12,24 +22,38 @@ Gesture detection works in three steps:
  2. Estimating the direction and curl of each individual finger
  3. Comparing the result to a set of gesture descriptions
 
-Step (1) is performed by TensorFlow's "handpose", Step (2) and (3) are handled by this library.
+Step (1) is performed by MediaPipe Handpose, Step (2) and (3) are handled by this library.
 
 ## Installation
 
-Install the module via NPM:
+ 1. Install [MediaPipe Handpose](https://github.com/tensorflow/tfjs-models/tree/master/handpose)
+ 2. Install the module via NPM or Yarn:
 ```
 npm i --save fingerpose
 ```
-## Usage
+## Demo
+
+### 1. Web Browser
+
 A [fully working example](https://github.com/andypotato/fingerpose/blob/master/dist/index.html) can be found inside the `dist` folder. The basic steps are outlined below:
 
-#### Include "handpose" and this library
+#### Include MediaPipe Handpose and its prerequisites (TFJS >= 2.1.0)
 ```
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+<!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
+<script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
+<script src="https://unpkg.com/@tensorflow/tfjs-converter@3.7.0/dist/tf-converter.js"></script>
+
+<!-- use the WebGL backend (recommended) - you can alternatively use the WASM backend -->
+<script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@3.7.0/dist/tf-backend-webgl.js"></script>
+
+<script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
+```
+
+#### Include this library
+```
 <script src="fingerpose.js" type="text/javascript"></script>
 ```
-#### Configure the gesture recognizer with known gestures
+#### Add the gestures you want do detect
 ```
 // add "✌🏻" and "👍" as sample gestures
 const GE = new fp.GestureEstimator([
@@ -38,7 +62,7 @@ const GE = new fp.GestureEstimator([
 ]);
 ```
 
-#### Use "handpose" to estimate the landmarks
+#### Use Handpose to estimate the landmarks
 ```
 const model = await handpose.load();
 const predictions = await model.estimateHands(video, true);
@@ -46,21 +70,21 @@ const predictions = await model.estimateHands(video, true);
 
 #### Estimate the gestures
 ```
-// using a minimum confidence of 7.5 (out of 10)
-const estimatedGestures = GE.estimate(predictions.landmarks, 7.5);
+// using a minimum match score of 8.5 (out of 10)
+const estimatedGestures = GE.estimate(predictions.landmarks, 8.5);
 ```
-The result is an object containing possible gestures and their confidence, for example:
+The result is an object containing possible gestures and their match score, for example:
 ```
 {
     poseData: [ ... ],
     gestures: [
-        { name: 'thumbs_up', confidence: 9.25 },
+        { name: 'thumbs_up', score: 9.25 },
         { ... }
     ]
 }
 ```
 
-In addition you receive the `poseData` array including the raw pose and direction information for each finger. This is useful for debugging purposes as it can help you understand how an individual finger curl / direction is estimated by the library.
+In addition you receive the `poseData` array including the raw curl and direction information for each finger. This is useful for debugging purposes as it can help you understand how an individual finger is "seen" by the library.
 
 ```
 // example for raw pose data
@@ -74,7 +98,7 @@ poseData: [
 ## Define your own gestures
 You can create any number of hand gestures for this library to recognize. To see how a gesture is described, have a look at the included sample gestures [Victory](https://github.com/andypotato/fingerpose/blob/master/src/gestures/Victory.js) and [Thumbs Up](https://github.com/andypotato/fingerpose/blob/master/src/gestures/ThumbsUp.js).
 
-A gesture is defined by describing the expected curl and direction of each individual finger. For example for a "Thumbs Up" gesture is defined by the stretched out thumb pointing up while all other fingers are curled and pointing to the left or right 👍.
+A gesture is defined by describing the expected curl and direction of each individual finger. For example for a "Thumbs Up" gesture is defined by a stretched out thumb pointing up while all other fingers are curled and pointing to the left or right 👍.
 
 To describe gestures, you can use the provided [Finger Description Constants](https://github.com/andypotato/fingerpose/blob/master/src/FingerDescription.js):
 
@@ -119,40 +143,57 @@ const thumbsDownGesture = new fp.GestureDescription('thumbs_down');
 ```
 Expect the thumb to be stretched out and pointing down:
 ```
-thumbsDownGesture.addCurl(fp.Finger.Thumb, fp.FingerCurl.NoCurl, 1.0);
+thumbsDownGesture.addCurl(fp.Finger.Thumb, fp.FingerCurl.NoCurl);
 thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.VerticalDown, 1.0);
-thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownLeft, 0.5);
-thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownRight, 0.5);
 ```
-This will define that a thumb pointing downwards will result in the highest confidence (1.0) for this gesture. If the thumb is angled to diagonal down left / right we can somehow still accept it, but with a lower confidence (0.5).
+This will define that a thumb pointing downwards will result in the highest score (1.0) for this gesture. If the thumb is angled to diagonal down left / right we can somehow still accept it, albeit with a lower score (0.9).
+```
+thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownLeft, 0.9);
+thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownRight, 0.9);
+```
 
-All other fingers are expected to be fully curled. For this gesture it doesn't really matter which direction the curled fingers are pointing at therefore only the curl description is added.
+All other fingers are expected to be fully curled. For this gesture it doesn't really matter which direction the curled fingers are pointing at therefore only the curl description is added. Same as above, it's recommended to accept half curled fingers too, with a little bit lower score.
 ```
 // do this for all other fingers
-thumbsDownGesture.addCurl(fp.Finger.Index, fp.FingerCurl.FullCurl, 1.0);
-thumbsDownGesture.addCurl(fp.Finger.Middle, fp.FingerCurl.FullCurl, 1.0);
-thumbsDownGesture.addCurl(fp.Finger.Ring, fp.FingerCurl.FullCurl, 1.0);
-thumbsDownGesture.addCurl(fp.Finger.Pinky, fp.FingerCurl.FullCurl, 1.0);
-
+for(let finger of [fp.Finger.Index, fp.Finger.Middle, fp.Finger.Ring, fp.Finger.Pinky]) {
+  thumbsUpDescription.addCurl(finger, FingerCurl.FullCurl, 1.0);
+  thumbsUpDescription.addCurl(finger, FingerCurl.HalfCurl, 0.9);
+}
 ```
-
-#### The meaning of confidence
-"Confidence" is a number between 0 and 10 which describes how accurate a given combination of finger curl / positions matches a predefined gesture. You should design your gestures so a perfect match will result in a confidence of "10".
-
 ## Tips to improve detection
 
-* The most stable detection is achieved when you can require confidences of 8 or higher.
-* Many poses do not require fingers pointing in a specific direction but are defined by curls only. In these cases just do not add direction constraints to your pose.
-* You can also have individual fingers reduce confidence which means "This finger should absolutely not appear in this way".
+### Experiment with scores and weights
 
-## Debugging your gestures
+The "score" is a number between 0 and 10 which describes how good a given combination of finger curl / positions matches a predefined gesture. A perfect match will result in a score of 10.
+
+* The score threshold should be set rather high (at least 8, better 8.5). If you want to distinguish very similar gestures like "Thumbs up" and "Thumbs down", then add more constraints to your gesture descriptions.
+* Try to experiment with the score for individual fingers. You can add more (or less) weight to single curl / direction by settng the third parameter to a value lower or higher than 1.0.
+
+### Check if you really need a finger pointing direction
+
+Many poses do not require fingers pointing in a specific direction but are defined by curls only. In these cases just do not add direction constraints to your pose. This also makes it easier to account for left-/right-handed persons.
+
+Also note: Unless you're Houdini, you can not fully curl your thumb.
+
+### Pre-process your input data
+
+* Consider running another model like [PoseNet](https://github.com/tensorflow/tfjs-models/tree/master/posenet) to detect the hand position(s) first, then crop your input image to only contain the hand. This will not only significantly reduce false detections but also speed up Handpose inference as much less image data needs to be processed (PoseNet is cheap in comparison).
+* MediaPipe Handpose does not offer much customization. Still you can try playing with the model parameters, especially `detectionConfidence` and `iouThreshold` which can improve accuracy under some lighting conditions.
+
+### Post-process your detections
+
+You should treat your detections as a "noisy signal" and add some smoothing / filtering. For example:
+
+* Easy: Use an average of (for example) three consecutive detections (basically a high pass filter)
+* Advanced: Use filters like One-Euro filters
+
+### Debug your gestures
 
  Look at the raw pose data result in `GestureEstimator::estimate()` to understand the detected curls / directions for each finger to the console. This way you can verify if your assumed curls / directions match with what the estimator actually sees.
 
-## Known issues / limitations
+## Known issues and limitations
  - Currently only one hand is supported at the same time. This is a limitation of the underlying `handpose` model and may or may not change in the future.
  - The `handpose` model has issues detecting a single stretched out finger (for example index finger). It will occasionally not detect a finger going from "curled" to "not curled" or vice-versa.
-
 
 ## Credits
 
