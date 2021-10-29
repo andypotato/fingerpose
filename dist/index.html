@@ -29,13 +29,34 @@
       height: 100%;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      background-color: #333333;
-      color: #ffffff;
+      background-color: #ffffff;
+      color: #333333;
     }
 
     body {
       margin: 0;
       padding: 0;
+    }
+
+    .container {
+      margin: 20px auto;
+      display: flex;
+    }
+
+    .video,
+    .debug {
+      padding: 0 20px;
+    }
+
+    table.summary {
+      border: 1px solid #333;
+      border-collapse: collapse;
+    }
+
+    table.summary td,
+    table.summary th {
+      border: 1px solid #333;
+      padding: 5px 8px;
     }
 
     #video-container {
@@ -65,10 +86,61 @@
 </head>
 <body>
 
-  <div id="video-container">
-    <video id="pose-video" class="layer" playsinline></video>
-    <canvas id="pose-canvas" class="layer"></canvas>
-    <div id="pose-result" class="layer"></div>
+  <div class="container">
+
+    <div class="video">
+      <div id="video-container">
+        <video id="pose-video" class="layer" playsinline></video>
+        <canvas id="pose-canvas" class="layer"></canvas>
+        <div id="pose-result" class="layer"></div>
+      </div>
+    </div>
+
+    <div class="debug">
+      <table class="summary">
+        <thead>
+          <tr>
+            <th>Idx</th>
+            <th>Finger</th>
+            <th style="width: 110px">Curl</th>
+            <th style="width: 170px">Direction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0</td>
+            <td>Thumb</td>
+            <td><span id="curl-0">-</span></td>
+            <td><span id="dir-0">-</span></td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Index</td>
+            <td><span id="curl-1">-</span></td>
+            <td><span id="dir-1">-</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Middle</td>
+            <td><span id="curl-2">-</span></td>
+            <td><span id="dir-2">-</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Ring</td>
+            <td><span id="curl-3">-</span></td>
+            <td><span id="dir-3">-</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Pinky</td>
+            <td><span id="curl-4">-</span></td>
+            <td><span id="dir-4">-</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
   <script>
@@ -132,19 +204,23 @@
             }
           }
 
-          // now estimate gestures based on landmarks
-          // using a minimum confidence of 7.5 (out of 10)
-          const est = GE.estimate(predictions[i].landmarks, 7.5);
+          // estimate gestures based on landmarks
+          // using a minimum score of 9 (out of 10)
+          // gesture candidates with lower score will not be returned
+          const est = GE.estimate(predictions[i].landmarks, 9);
 
           if(est.gestures.length > 0) {
 
-            // find gesture with highest confidence
+            // find gesture with highest match score
             let result = est.gestures.reduce((p, c) => { 
-              return (p.confidence > c.confidence) ? p : c;
+              return (p.score > c.score) ? p : c;
             });
 
             resultLayer.innerText = gestureStrings[result.name];
           }
+
+          // update debug info
+          updateDebugInfo(est.poseData);
         }
 
         // ...and so on
@@ -185,6 +261,13 @@
       ctx.arc(x, y, r, 0, 2 * Math.PI);
       ctx.fillStyle = color;
       ctx.fill();
+    }
+
+    function updateDebugInfo(data) {
+      for(let fingerIdx in data) {
+        document.getElementById("curl-" + fingerIdx).innerText = data[fingerIdx][1];
+        document.getElementById("dir-" + fingerIdx).innerText = data[fingerIdx][2];
+      }
     }
 
     window.addEventListener("DOMContentLoaded", () => {
