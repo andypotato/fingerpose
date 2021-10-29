@@ -3,9 +3,20 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
   <title>FingerPose Example</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+
+  <!-- Require the peer dependencies of handpose. -->
+  <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-converter@3.7.0/dist/tf-converter.js"></script>
+
+  <!-- You must explicitly require a TF.js backend if you're not using the tfs union bundle. -->
+  <script src="https://unpkg.com/@tensorflow/tfjs-backend-webgl@3.7.0/dist/tf-backend-webgl.js"></script>
+
+  <!-- The main handpose library -->
+  <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
+
+  <!-- The fingerpose library -->
   <script src="fingerpose.js" type="text/javascript"></script>
+
   <style>
 
     * {

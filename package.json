@@ -1,6 +1,6 @@
 {
   "name": "fingerpose",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Finger pose classifier for hand landmarks detected by TensorFlow.js handpose model",
   "main": "dist/fingerpose.js",
   "source": "src/index.js",

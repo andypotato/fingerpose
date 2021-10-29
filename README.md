@@ -1,5 +1,3 @@
-
-
 # fingerpose
 
 Finger pose classifier for hand landmarks detected by TensorFlow.js' [handpose](https://github.com/tensorflow/tfjs-models/tree/master/handpose) model. It can detect hand gestures like "Victory" ✌️or "Thumbs Up" 👍inside a webcam source picture. You can define additional hand gestures using [gesture descriptions](https://github.com/andypotato/fingerpose/tree/master/src/gestures). 
