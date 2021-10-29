@@ -11,16 +11,16 @@ export default class GestureEstimator {
     this.gestures = knownGestures;
   }
 
-  estimate(landmarks, minConfidence) {
+  estimate(landmarks, minScore) {
 
     let gesturesFound = [];
 
     // step 1: get estimations of curl / direction for each finger
     const est = this.estimator.estimate(landmarks);
 
-    let debugInfo = [];
+    let poseData = [];
     for(let fingerIdx of Finger.all) {
-      debugInfo.push([
+      poseData.push([
         Finger.getName(fingerIdx),
         FingerCurl.getName(est.curls[fingerIdx]),
         FingerDirection.getName(est.directions[fingerIdx])
@@ -29,17 +29,17 @@ export default class GestureEstimator {
 
     // step 2: compare gesture description to each known gesture
     for(let gesture of this.gestures) {
-      let confidence = gesture.matchAgainst(est.curls, est.directions);
-      if(confidence >= minConfidence) {
+      let score = gesture.matchAgainst(est.curls, est.directions);
+      if(score >= minScore) {
         gesturesFound.push({
           name: gesture.name,
-          confidence: confidence
+          score: score
         });
       }
     }
 
     return {
-      poseData: debugInfo,
+      poseData: poseData,
       gestures: gesturesFound
     };
   }

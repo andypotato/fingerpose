@@ -1,44 +1,32 @@
-import { Finger } from './FingerDescription';
-
 export default class GestureDescription {
   constructor(name) {
 
     // name (should be unique)
     this.name = name;
 
+    // gesture as described by curls / directions
     this.curls = {};
     this.directions = {};
-
-    this.weights = [1.0, 1.0, 1.0, 1.0, 1.0];
-    this.weightsRelative = [1.0, 1.0, 1.0, 1.0, 1.0];
   }
 
-  addCurl(finger, curl, confidence) {
+  addCurl(finger, curl, contrib=1.0) {
     if(typeof this.curls[finger] === 'undefined') {
       this.curls[finger] = [];
     }
-    this.curls[finger].push([curl, confidence]);
+    this.curls[finger].push([curl, contrib]);
   }
 
-  addDirection(finger, position, confidence) {
+  addDirection(finger, position, contrib=1.0) {
     if(typeof this.directions[finger] === 'undefined') {
       this.directions[finger] = [];
     }
-    this.directions[finger].push([position, confidence]);
-  }
-
-  setWeight(finger, weight) {
-
-    this.weights[finger] = weight;
-
-    // recalculate relative weights
-    let total = this.weights.reduce((a, b) => a + b, 0);
-    this.weightsRelative = this.weights.map(el => el * 5 / total );
+    this.directions[finger].push([position, contrib]);
   }
 
   matchAgainst(detectedCurls, detectedDirections) {
 
-    let confidence = 0.0;
+    let score = 0.0;
+    let numParameters = 0;
 
     // look at the detected curl of each finger and compare with
     // the expected curl of this finger inside current gesture
@@ -49,17 +37,28 @@ export default class GestureDescription {
 
       if(typeof expectedCurls === 'undefined') {
         // no curl description available for this finger
-        // add default confidence of "1"
-        confidence += this.weightsRelative[fingerIdx];
+        // => no contribution to the final score
         continue;
       }
 
+      // increase the number of relevant parameters
+      numParameters++;
+
       // compare to each possible curl of this specific finger
-      for(const [expectedCurl, score] of expectedCurls) {
+      let matchingCurlFound = false;
+      let highestCurlContrib = 0;
+      for(const [expectedCurl, contrib] of expectedCurls) {
         if(detectedCurl == expectedCurl) {
-          confidence += score * this.weightsRelative[fingerIdx];
+          score += contrib;
+          highestCurlContrib = Math.max(highestCurlContrib, contrib);
+          matchingCurlFound = true;
           break;
         }
+      }
+
+      // subtract penalty if curl was expected but not found
+      if(!matchingCurlFound) {
+        score -= highestCurlContrib;
       }
     }
 
@@ -71,20 +70,34 @@ export default class GestureDescription {
 
       if(typeof expectedDirections === 'undefined') {
         // no direction description available for this finger
-        // add default confidence of "1"
-        confidence += this.weightsRelative[fingerIdx];
+        // => no contribution to the final score
         continue;
       }
 
+      // increase the number of relevant parameters
+      numParameters++;
+
       // compare to each possible direction of this specific finger
-      for(const [expectedDirection, score] of expectedDirections) {
+      let matchingDirectionFound = false;
+      let highestDirectionContrib = 0;
+      for(const [expectedDirection, contrib] of expectedDirections) {
         if(detectedDirection == expectedDirection) {
-          confidence += score * this.weightsRelative[fingerIdx];
+          score += contrib;
+          highestDirectionContrib = Math.max(highestDirectionContrib, contrib);
+          matchingDirectionFound = true;
           break;
         }
       }
+
+      // subtract penalty if direction was expected but not found
+      if(!matchingDirectionFound) {
+        score -= highestDirectionContrib;
+      }
     }
 
-    return confidence;
+    // multiply final score with 10 (to maintain compatibility)
+    let finalScore = (score / numParameters) * 10;
+
+    return finalScore;
   }
 }
