@@ -4,11 +4,12 @@ Finger gesture classifier for hand landmarks detected by [MediaPipe Handpose](ht
 
 !["Thumbs up" and "Victory" gestures detected](https://raw.githubusercontent.com/andypotato/fingerpose/master/assets/fingers-lq.gif)
 
-# Usage
+# Table of contents
 
 - [How it works](#how-it-works)
 - [Installation](#installation)
 - [Demo](#demo)
+- [Quick start](#quickstart)
 - [Define your own gestures](#define-your-own-gestures)
 - [Tips to improve detection](#tips-to-improve-detection)
 - [Known issues and limitations](#known-issues-and-limitations)
@@ -33,11 +34,19 @@ npm i --save fingerpose
 ```
 ## Demo
 
-### 1. Web Browser
+### Basic example
 
-A [fully working example](https://github.com/andypotato/fingerpose/blob/master/dist/index.html) can be found inside the `dist` folder. The basic steps are outlined below:
+A [basic working example](https://github.com/andypotato/fingerpose/blob/master/dist/index.html) can be found inside the `dist` folder. This example also includes debug output which can be useful when you are creating your own gestures.
 
-#### Include MediaPipe Handpose and its prerequisites (TFJS >= 2.1.0)
+[Click here to open the example](https://andypotato.github.io/fingerpose/dist/index.html)
+
+### Rock, Paper, Scissors game
+
+A simple [Rock, Scissors, Paper game](https://github.com/andypotato/rock-paper-scissors) which shows how to integrate this library in a real-world project.
+
+## Quick start
+
+### Include MediaPipe Handpose and its prerequisites (TFJS >= 2.1.0)
 ```
 <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
 <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
@@ -49,11 +58,11 @@ A [fully working example](https://github.com/andypotato/fingerpose/blob/master/d
 <script src="https://unpkg.com/@tensorflow-models/handpose@0.0.7/dist/handpose.js"></script>
 ```
 
-#### Include this library
+### Include this library
 ```
 <script src="fingerpose.js" type="text/javascript"></script>
 ```
-#### Add the gestures you want do detect
+### Add the gestures you want do detect
 ```
 // add "✌🏻" and "👍" as sample gestures
 const GE = new fp.GestureEstimator([
@@ -62,13 +71,13 @@ const GE = new fp.GestureEstimator([
 ]);
 ```
 
-#### Use Handpose to estimate the landmarks
+### Use Handpose to estimate the landmarks
 ```
 const model = await handpose.load();
 const predictions = await model.estimateHands(video, true);
 ```
 
-#### Estimate the gestures
+### Estimate the gestures
 ```
 // using a minimum match score of 8.5 (out of 10)
 const estimatedGestures = GE.estimate(predictions.landmarks, 8.5);
