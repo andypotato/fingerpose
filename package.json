@@ -21,6 +21,9 @@
   ],
   "author": "Andreas Schallwig",
   "license": "MIT",
+  "engines": {
+    "node": "10"
+  },
   "bugs": {
     "url": "https://github.com/andypotato/fingerpose/issues"
   },

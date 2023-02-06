@@ -11,10 +11,17 @@ export default class GestureEstimator {
     this.gestures = knownGestures;
   }
 
-  estimate(landmarks, minScore) {
+  #getLandMarksFromKeypoints(keypoints3D) {
+    return keypoints3D.map(keypoint =>
+      [keypoint.x, keypoint.y, keypoint.z]
+    );
+  }
+
+  estimate(keypoints3D, minScore) {
 
     let gesturesFound = [];
 
+    const landmarks = this.#getLandMarksFromKeypoints(keypoints3D);
     // step 1: get estimations of curl / direction for each finger
     const est = this.estimator.estimate(landmarks);
 
