@@ -160,7 +160,8 @@
 
     const gestureStrings = {
       'thumbs_up': '👍',
-      'victory': '✌🏻'
+      'victory': '✌🏻',
+      'hang_loose': '🤙'
     };
 
     async function main() {
@@ -172,10 +173,11 @@
       const resultLayer = document.querySelector("#pose-result");
 
       // configure gesture estimator
-      // add "✌🏻" and "👍" as sample gestures
+      // add "✌🏻", "👍" and '🤙' as sample gestures
       const knownGestures = [
         fp.Gestures.VictoryGesture,
-        fp.Gestures.ThumbsUpGesture
+        fp.Gestures.ThumbsUpGesture,
+        fp.Gestures.HangLooseGesture,
       ];
       const GE = new fp.GestureEstimator(knownGestures);
 
