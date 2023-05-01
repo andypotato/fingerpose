@@ -40,7 +40,7 @@ A simple [Rock, Scissors, Paper game](https://github.com/andypotato/rock-paper-s
 ## Quick start
 
 ### Include MediaPipe Handpose and its prerequisites (TFJS >= 2.1.0)
-```
+```html
 <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
 <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
 
@@ -54,18 +54,18 @@ A simple [Rock, Scissors, Paper game](https://github.com/andypotato/rock-paper-s
 ```
 
 ### Include this library
-```
+```html
 <script src="https://cdn.jsdelivr.net/npm/fingerpose@0.1.0/dist/fingerpose.min.js" type="text/javascript"></script>
 ```
 #### Alternatives
 You can copy the whole file from [fingerpose.js](./dist/fingerpose.js) or install from NPM with
 
-```
+```console
 npm install fingerpose
 ```
 
 ### Add the gestures you want do detect
-```
+```javascript
 // add "✌🏻" and "👍" as sample gestures
 const GE = new fp.GestureEstimator([
     fp.Gestures.VictoryGesture,
@@ -74,18 +74,18 @@ const GE = new fp.GestureEstimator([
 ```
 
 ### Use Handpose to estimate the landmarks
-```
+```javascript
 const model = await handpose.load();
 const predictions = await model.estimateHands(video, true);
 ```
 
 ### Estimate the gestures
-```
+```javascript
 // using a minimum match score of 8.5 (out of 10)
 const estimatedGestures = GE.estimate(predictions.landmarks, 8.5);
 ```
 The result is an object containing possible gestures and their match score, for example:
-```
+```javascript
 {
     poseData: [ ... ],
     gestures: [
@@ -97,7 +97,7 @@ The result is an object containing possible gestures and their match score, for 
 
 In addition, you receive the `poseData` array including the raw curl and direction information for each finger. This is useful for debugging purposes as it can help you understand how an individual finger is "seen" by the library.
 
-```
+```javascript
 // example for raw pose data
 poseData: [
     ['Thumb', 'No Curl', 'Vertical Up],
@@ -148,22 +148,22 @@ You can refer to the images below for an example of how the index finger is curl
 
 #### Example: Thumbs down gesture description 👎
 First, create a new GestureDescription object:
-```
+```javascript
 const thumbsDownGesture = new fp.GestureDescription('thumbs_down');
 ```
 Expect the thumb to be stretched out and pointing down:
-```
+```javascript
 thumbsDownGesture.addCurl(fp.Finger.Thumb, fp.FingerCurl.NoCurl);
 thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.VerticalDown, 1.0);
 ```
 This will define that a thumb pointing downwards will result in the highest score (1.0) for this gesture. If the thumb is angled diagonally down left / right we can somehow still accept it, albeit with a lower score (0.9).
-```
+```javascript
 thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownLeft, 0.9);
 thumbsDownGesture.addDirection(fp.Finger.Thumb, fp.FingerDirection.DiagonalDownRight, 0.9);
 ```
 
 All other fingers are expected to be fully curled. For this gesture, it doesn't matter which direction the curled fingers are pointing at therefore only the curl description is added. Same as above, it's recommended to accept half-curled fingers too, with a little bit lower score.
-```
+```javascript
 // do this for all other fingers
 for(let finger of [fp.Finger.Index, fp.Finger.Middle, fp.Finger.Ring, fp.Finger.Pinky]) {
   thumbsUpDescription.addCurl(finger, FingerCurl.FullCurl, 1.0);
