@@ -40,7 +40,7 @@ A simple [Rock, Scissors, Paper game](https://github.com/andypotato/rock-paper-s
 ## Quick start
 
 ### Include MediaPipe Handpose and its prerequisites (TFJS >= 2.1.0)
-```javascript
+```html
 <!-- this example uses TFJS 3.7.0 - older versions back to 2.1.0 are supported -->
 <script src="https://unpkg.com/@tensorflow/tfjs-core@3.7.0/dist/tf-core.js"></script>
 
@@ -54,7 +54,7 @@ A simple [Rock, Scissors, Paper game](https://github.com/andypotato/rock-paper-s
 ```
 
 ### Include this library
-```javascript
+```html
 <script src="https://cdn.jsdelivr.net/npm/fingerpose@0.1.0/dist/fingerpose.min.js" type="text/javascript"></script>
 ```
 #### Alternatives
