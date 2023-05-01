@@ -60,7 +60,7 @@ A simple [Rock, Scissors, Paper game](https://github.com/andypotato/rock-paper-s
 #### Alternatives
 You can copy the whole file from [fingerpose.js](./dist/fingerpose.js) or install from NPM with
 
-```shell
+```console
 npm install fingerpose
 ```
 
